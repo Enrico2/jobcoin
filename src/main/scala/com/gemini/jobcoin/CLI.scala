@@ -17,6 +17,8 @@ object CLI extends App {
       |  - help                                       print this help.
       |  - register [address]*                        register one or more addresses. Get a dropbox address back
       |  - send [fromAddress] [toAddress] [amount]    Send Jobcoins
+      |  - balance [address]                          Get balance
+      |  - reset                                      Move all coins back to OGAccount
       |  - quit                                       Quits, duh. ;)
       |""".stripMargin
 
@@ -24,12 +26,12 @@ object CLI extends App {
   println(help)
 
   print("> ")
-  var in = scala.io.StdIn.readLine().toLowerCase().trim
+  var in = scala.io.StdIn.readLine().trim
 
-  while (in != "quit") {
+  while (in.toLowerCase() != "quit") {
     if (in.isEmpty) {
       println("You gotta type something though... Try again.")
-    } else if (in == "help") {
+    } else if (in.toLowerCase() == "help") {
       println(help)
     } else {
       val req = http.Request(http.Method.Post, "/")
@@ -52,7 +54,7 @@ object CLI extends App {
 
     println()
     print("> ")
-    in = scala.io.StdIn.readLine().toLowerCase()
+    in = scala.io.StdIn.readLine()
   }
 
   println("Wow, that was great code there. Goodbye!")

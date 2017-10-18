@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finagle.{Http, Service, http}
 import com.twitter.io.Buf
+import com.twitter.io.Buf.Utf8
 import com.twitter.util._
 import scala.math.BigDecimal.RoundingMode
 
@@ -64,11 +65,12 @@ object Jobcoin extends App {
   val proxyMixer = new ProxyMixer(mixerPromise)
   val network = new JobcoinNetwork()
 
+  // Provided 2 tumblers, for fun.
   val tumbler = new UniformDistributionTumbler(0.5, "ThisIsWhereFeesGo", Duration.fromSeconds(10), "BigHouseAddress")
   val tumbler2 = new RandomTumbler("BigHouseAddress", Duration.fromSeconds(12))
 
   val mixer = new InMemoryMixer(
-    MixerConfig("BigHouseAddress", tumbler),
+    MixerConfig("BigHouseAddress", tumbler2),
     RandomStringAddressGenerator,
     new InMemoryAddressManager(),
     network,
@@ -83,18 +85,40 @@ object Jobcoin extends App {
   val service = new Service[http.Request, http.Response] {
     val okResponse = http.Response(http.Status.Ok)
 
+    private[this] def handle(e: Throwable): Response = {
+      val response = http.Response(http.Status.InternalServerError)
+      response.content = Utf8.apply(e.getMessage)
+      response
+    }
+
     def apply(request: Request): Future[Response] = {
       val in = Buf.decodeString(request.content, StandardCharsets.UTF_8)
 
       val split = in.split(' ')
       val cmd = split.head
 
-      cmd match {
-        case "register" => Future.Done.map { _ => okResponse }
-        case "send" => Future.Done.map { _ => okResponse }
-        case "test" => sampleScript().map { _ => okResponse }
-        case "reset" => reset().map { _ => okResponse }
-      }
+      try {
+        val response = cmd.toLowerCase() match {
+          case "send" => network.createTransaction(new Transaction(Some(split(1)), split(2), BigDecimal(split(3)))).map { _ => okResponse }
+          case "test" => sampleScript().map { _ => okResponse }
+          case "register" => mixer.subscribe(split.drop(1).toSeq).map { dropbox =>
+            val rep = http.Response(http.Status.Ok)
+            rep.content = Utf8(s"Transfer your coins to $dropbox and they'll be tumbled!")
+            rep
+          }
+          case "balance" => network.getAddressBalance(split(1)).map { balance =>
+            val rep = http.Response(http.Status.Ok)
+            rep.content = Utf8(s"The balance of ${split(1)} is $balance jobcoins.")
+            rep
+          }
+          case "reset" => reset().map { _ => okResponse }
+        }
+
+        response.handle {
+          case e: Throwable => handle(e)
+        }
+
+      } catch { case e: Throwable => Future.value(handle(e)) }
     }
   }
 
