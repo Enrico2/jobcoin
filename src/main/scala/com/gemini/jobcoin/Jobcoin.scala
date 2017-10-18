@@ -128,3 +128,5 @@ object Jobcoin extends App {
   log.info(s"Monitoring of the Jobcoin network will start when the first register is sent")
   Await.ready(server)
 }
+
+case class MixerConfig(bigHouseAddress: Address, tumbler: Tumbler)

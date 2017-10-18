@@ -4,8 +4,6 @@ import com.twitter.util.{Duration, Time}
 import scala.math.BigDecimal.RoundingMode
 import scala.util.Random
 
-case class MixerConfig(bigHouseAddress: Address, tumbler: Tumbler)
-
 trait Tumbler extends ((Seq[Address], BigDecimal) => Seq[ScheduledTask[Transaction]])
 
 /**
