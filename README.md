@@ -2,8 +2,8 @@
 Take-home assignment from Gemini.com
 
 ## How to run:
-1. First run the server `chmod +x run_server.sh; run_server.sh`
-2. In a separate terminal window, run the cli `chmod +x run_cli.sh; run_cli.sh`
+1. First run the server (`chmod +x` if it's not executable) `run_server.sh`
+2. In a separate terminal window, run the cli `run_cli.sh`
 3. Follow the instructions on screen.
 
 Comments and notes:
