@@ -1,0 +1,39 @@
+@startuml
+
+package "Server" {
+  agent "Mixer"
+  agent "NetworkMonitor"
+  agent "Network (API)" as api
+  database "storage" { 
+    agent "Address Manager" as amgr 
+  }
+  agent "Transaction Scheduler" as sched
+  agent Service
+}
+
+agent jobcoin.gemini.com
+
+"CLI (user)" as CLI
+
+CLI --> Service : register
+CLI --> Service : send
+CLI --> Service : balance
+
+Service --> Mixer : subscribe
+Service --> api : createTransaction
+Service --> api : getBalance
+
+Mixer --> amgr : getTargetAddresses
+Mixer --> amgr : setUserDropbox
+Mixer --> NetworkMonitor : addMixerWatch
+Mixer --> sched : schedule
+Mixer --> api : createTransaction
+
+NetworkMonitor --> api : getTransactions
+NetworkMonitor --> Mixer : notifyMixerWatch
+
+sched --> api : createTransaction
+
+api ..> jobcoin.gemini.com : HTTP REST
+
+@enduml

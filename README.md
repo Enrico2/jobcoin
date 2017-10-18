@@ -6,6 +6,15 @@ Take-home assignment from Gemini.com
 2. In a separate terminal window, run the cli `run_cli.sh`
 3. Follow the instructions on screen.
 
+## How to review this code:
+The main entry point to the server is `Jobcoin.scala`. 
+That code Instantiates all the relevant objects and wires everything together. It also creates and runs a lightweight HTTP server.
+Then I recommend this order: AddressManager, AddressGenerator, Tumbler, Mixer, JobcoinNetwork, NetworkMonitor, TransactionScheduler, everything else.
+
+## Call diagram (not my best work :))
+
+![ugly call diagram I whipped up](jobcoin.uml.png?raw=true)
+
 Comments and notes:
 -----------------------------
 1. Separation of systems
