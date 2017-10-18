@@ -51,6 +51,7 @@ Comments and notes:
 
 4. There's relevant documentation in the code itself.
 
-5. I didn't write unit tests for everything, didn't know if you expected any. If you did expect them, let me know asap and I'll write some. Thanks!
+5. I didn't write unit tests, didn't know if you expected any. If you did expect them, let me know asap and I'll write some. Thanks!
+   
    (fwiw, I did have some local scripts I wrote to test, you can see one by running `test` in the cli, but didn't fiddle around with integrating various unit
    testing frameworks, e.g. scalatest.)
